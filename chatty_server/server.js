@@ -70,7 +70,9 @@ wss.on('connection', (ws) => {
                 "content" : `<img src="${message.content}" alt=""/>`,
                 "type" : "incomingMessageWithPicture",
                 "id" : uuidV1(),
+                // username is for changing username, if set to undefined (below), username won't be updated
                 "username" : message.username,
+                // displayName is for displaying name with message
                 "displayName": message.username,
                 "color" : color
               }
@@ -83,7 +85,9 @@ wss.on('connection', (ws) => {
               message = {
               "type": "incomingMessage",
               "id": uuidV1(),
+              // username is for changing username, if set to undefined (below), username won't be updated
               "username": message.username,
+              // displayName is for displaying name with message
               "displayName": message.username,
               "content": message.content,
               "color": color
@@ -97,7 +101,9 @@ wss.on('connection', (ws) => {
             message = {
             "type": "incomingNotification",
             "id": uuidV1(),
+            // username is for changing username, if set to undefined (below), username won't be updated
             "username": message.username,
+            // displayName is for displaying name with message
             "displayName": message.username,
             "content": message.content,
             "color": color
