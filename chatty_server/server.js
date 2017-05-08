@@ -17,6 +17,7 @@ const server = express()
 // Create the WebSockets server
 const wss = new SocketServer({ server });
 
+// For user counter, initialize at 0
 let numClients = 0;
 
 // Set up a callback that will run when a client connects to the server
@@ -24,9 +25,11 @@ let numClients = 0;
 // the ws parameter in the callback.
 wss.on('connection', (ws) => {
 
+  // whenever someone logs in, add one to numClients
   numClients += 1;
   console.log("Number of users:", numClients);
 
+  // For broadcasting numClients
   const broadcastNumClients = (num) => {
     wss.clients.forEach((c) => {
       message = {"type":"numClients", "value":num};
@@ -36,6 +39,7 @@ wss.on('connection', (ws) => {
 
   broadcastNumClients(numClients);
 
+  // Random Color generator
   function randomColor () {
     const rand255 = () => {
       return Math.floor(Math.random() * 255);
@@ -43,10 +47,12 @@ wss.on('connection', (ws) => {
     return "rgb(" + rand255() + "," + rand255() + "," + rand255() + ")";
   }
 
+  // The color for one client (stay the same throughout his/her session)
   const color = randomColor();
 
     ws.on('message', (rawMessage) => {
 
+      // message broadcast to everyone except sender
       const broadcast = (message) => {
         wss.clients.forEach((c) => {
           if(c != ws) {
@@ -58,7 +64,8 @@ wss.on('connection', (ws) => {
       message = JSON.parse(rawMessage);
       switch(message.type) {
         case "postMessage":
-            if (matches = message.content.match(/.png$/)) {
+            if (matches = message.content.match(/\.(png|jpg|jpeg|gif)$/)) {
+              // If message is a url to a pic, want to show the pic.
               message = {
                 "content" : `<img src="${message.content}" alt=""/>`,
                 "type" : "incomingMessageWithPicture",
@@ -67,11 +74,12 @@ wss.on('connection', (ws) => {
                 "displayName": message.username,
                 "color" : color
               }
-            ws.send(JSON.stringify(message));
-            message.username = undefined;
-            broadcast(message);
+            ws.send(JSON.stringify(message)); // send to sender
+            message.username = undefined; // for everyone else, no need to update username
+            broadcast(message); // send to everyone else
             }
             else {
+              // otherwise display the message
               message = {
               "type": "incomingMessage",
               "id": uuidV1(),
@@ -80,9 +88,9 @@ wss.on('connection', (ws) => {
               "content": message.content,
               "color": color
               };
-            ws.send(JSON.stringify(message));
-            message.username = undefined;
-            broadcast(message);
+            ws.send(JSON.stringify(message)); // send to sender
+            message.username = undefined; // for everyone else, no need to update username
+            broadcast(message); // send to everyone else
             }
           break;
         case "postNotification":
@@ -94,9 +102,9 @@ wss.on('connection', (ws) => {
             "content": message.content,
             "color": color
             };
-            ws.send(JSON.stringify(message));
-            message.username = undefined;
-            broadcast(message);
+            ws.send(JSON.stringify(message)); // send to sender
+            message.username = undefined; // for everyone else, no need to update username
+            broadcast(message); // send to everyone else
           break;
         default:
         // show an error in the console if the message type is unknown
@@ -108,9 +116,9 @@ wss.on('connection', (ws) => {
     // Set up a callback for when a client closes the socket. This usually means they closed their browser.
     ws.on('close', () => {
       console.log('Client disconnected')
-      numClients -= 1;
+      numClients -= 1; // decrement numClients by 1 if someone exit
       console.log("Number of users:", numClients);
-      broadcastNumClients(numClients)// ws.send(`${numClients} users online`);
+      broadcastNumClients(numClients)
     });
 
 });
