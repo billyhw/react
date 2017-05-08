@@ -17,16 +17,8 @@ const server = express()
 // Create the WebSockets server
 const wss = new SocketServer({ server });
 
-// // Broadcast to all.
-// wss.broadcast = function broadcast(data) {
-//   wss.clients.forEach(function each(client) {
-//     if (client.readyState === SocketServer.OPEN) {
-//       client.send(JSON.stringify(data));
-//     }
-//   });
-// };
-
 let numClients = 0;
+
 // Set up a callback that will run when a client connects to the server
 // When a client connects they are assigned a socket, represented by
 // the ws parameter in the callback.
@@ -34,7 +26,6 @@ wss.on('connection', (ws) => {
 
   numClients += 1;
   console.log("Number of users:", numClients);
-  // ws.send(`${numClients} users online`);
 
   const broadcastNumClients = (num) => {
     wss.clients.forEach((c) => {
@@ -65,7 +56,6 @@ wss.on('connection', (ws) => {
       }
 
       message = JSON.parse(rawMessage);
-      console.log(message)
       switch(message.type) {
         case "postMessage":
             if (matches = message.content.match(/.png$/)) {
@@ -77,8 +67,9 @@ wss.on('connection', (ws) => {
                 "displayName": message.username,
                 "color" : color
               }
-            //broadcast(message);
             ws.send(JSON.stringify(message));
+            message.username = undefined;
+            broadcast(message);
             }
             else {
               message = {
@@ -89,9 +80,9 @@ wss.on('connection', (ws) => {
               "content": message.content,
               "color": color
               };
-              console.log('received message:', message);
-            //broadcast(message);
             ws.send(JSON.stringify(message));
+            message.username = undefined;
+            broadcast(message);
             }
           break;
         case "postNotification":
@@ -103,55 +94,9 @@ wss.on('connection', (ws) => {
             "content": message.content,
             "color": color
             };
-            console.log('received message:', message);
-            //broadcast(message);
             ws.send(JSON.stringify(message));
-          break;
-        default:
-        // show an error in the console if the message type is unknown
-        throw new Error("Unknown event type " + message.type);
-      }
-
-// broadcast to everyone else
-      message = JSON.parse(rawMessage);
-      switch(message.type) {
-        case "postMessage":
-            if (matches = message.content.match(/.png$/)) {
-              message = {
-                "content" : `<img src="${message.content}" alt=""/>`,
-                "type" : "incomingMessageWithPicture",
-                "id" : uuidV1(),
-                "username" : undefined,
-                "displayName": message.username,
-                "color" : color
-              }
-              broadcast(message)
-            }
-            else {
-              message = {
-              "type": "incomingMessage",
-              "id": uuidV1(),
-              "username": undefined,
-              "displayName": message.username,
-              "content": message.content,
-              "color": color
-              };
-              console.log('received message:', message);
-              broadcast(message);
-            }
-          break;
-        case "postNotification":
-            message = {
-            "type": "incomingNotification",
-            "id": uuidV1(),
-            "username": undefined,
-            "displayName": message.username,
-            "content": message.content,
-            "color": color
-            };
-            console.log('received message:', message);
+            message.username = undefined;
             broadcast(message);
-            //ws.send(JSON.stringify(message));
           break;
         default:
         // show an error in the console if the message type is unknown
