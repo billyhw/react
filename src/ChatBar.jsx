@@ -18,6 +18,7 @@ class ChatBar extends Component {
   handleSubmit = (event) => {
     event.preventDefault();
 
+    // if field is empty, user is anonymous
     if (!this.state.newUser) {
       this.state.newUser = "Anonymous";
     }
@@ -26,9 +27,11 @@ class ChatBar extends Component {
 
     this.state.newUser !== this.props.currentUser ?
       (
+        // send both notification and message if user changes name
         wss.send(JSON.stringify({"type": "postNotification", "content": `${this.props.currentUser} has changed name to ${this.state.newUser}.`})),
         wss.send(JSON.stringify({"type": "postMessage", "username": this.state.newUser, "content": this.state.newMessage}))
       ) :
+        // otherwise just send message
         wss.send(JSON.stringify({"type": "postMessage", "username": this.state.newUser, "content": this.state.newMessage}));
     // By setting newUser to the update newUser here, no need to type in current username everytime.
     this.setState({newUser: this.state.newUser, newMessage: ""});

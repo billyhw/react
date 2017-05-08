@@ -54,8 +54,11 @@ class App extends Component {
               color: rawMessage.color
             };
             messages = this.state.messages.concat(newMessage);
-            // this.setState({messages: messages})
-            // this.setState({currentUser: newMessage.username, messages: messages})
+            // If the message received has no username, then
+            // the message is a broadcast message from server
+            // just display message but don't change username
+            // Otherwise the message is the server response on
+            // the client-sent message, so update username
             this.setState({currentUser: rawMessage.username ? newMessage.username : this.state.currentUser, messages: messages})
           break;
         case "incomingMessageWithPicture":
@@ -68,8 +71,11 @@ class App extends Component {
               type: "incomingMessageWithPicture"
             };
             messages = this.state.messages.concat(newMessage);
-            // this.setState({messages: messages})
-            // this.setState({currentUser: newMessage.username, messages: messages})
+            // If the message received has no username, then
+            // the message is a broadcast message from server
+            // just display message but don't change username
+            // Otherwise the message is the server response on
+            // the client-sent message, so update username
             this.setState({currentUser: rawMessage.username ? newMessage.username : this.state.currentUser, messages: messages})
           break;
         case "incomingNotification":
@@ -82,10 +88,15 @@ class App extends Component {
               color: rawMessage.color
             };
             messages = this.state.messages.concat(newMessage);
-            // this.setState({currentUser: newMessage.username, messages: messages})
+            // If the message received has no username, then
+            // the message is a broadcast message from server
+            // just display message but don't change username
+            // Otherwise the message is the server response on
+            // the client-sent message, so update username
             this.setState({currentUser: rawMessage.username ? newMessage.username : this.state.currentUser, messages: messages})
           break;
         case "numClients":
+            // for number of users online count
             this.setState({numUsers: rawMessage.value});
           break;
         default:

@@ -88,6 +88,7 @@ body {
   text-decoration: none;
 }
 
+// For user count in nav-bar
 .userCount {
   color: inherit;
   display: block;
@@ -100,6 +101,7 @@ body {
   text-decoration: none;
 }
 
+// for images, ensure image width is at max 60% of body width
 .message-content > img {
-  width: 60%
+  max-width: 60%
 }

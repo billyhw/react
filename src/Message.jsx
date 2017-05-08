@@ -7,6 +7,7 @@ class Message extends Component {
       color: this.props.color
     }
 
+    // using dangerouslySetInnerHTML for image url
     return (
       <div className="message">
         <span className="message-username" style={test}>{this.props.displayName}</span>
